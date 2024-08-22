@@ -1,6 +1,6 @@
 import express from 'express';
-const router = express.Router();
 
+const router = express.Router();
 let posts = []; // Array untuk menyimpan postingan
 
 // Rute untuk menampilkan form pembuatan konten blog
@@ -26,5 +26,36 @@ router.post('/newTitle', (req, res) => {
 router.get('/', (req, res) => {
     res.render('index', { posts });
 });
+
+// Rute untuk menampilkan form edit postingan
+router.get('/edit/:id', (req, res) => {
+    const post = posts.find(p => p.id === parseInt(req.params.id));
+    if (!post) {
+        return res.status(404).send('Post not found');
+    }
+    res.render('edit', { post });
+});
+
+// Rute untuk memproses update postingan
+router.post('/edit/:id', (req, res) => {
+    const post = posts.find(p => p.id === parseInt(req.params.id));
+    if (!post) {
+        return res.status(404).send('Post not found');
+    }
+    post.content = req.body.content; // Mengupdate konten
+    post.title = req.body.title; // Mengupdate judul
+    res.redirect('/');
+});
+
+// Rute untuk menghapus postingan
+router.post('/delete/:id', (req, res) => {
+    const postIndex = posts.findIndex(p => p.id === parseInt(req.params.id));
+    if (postIndex === -1) {
+        return res.status(404).send('Post not found');
+    }
+    posts.splice(postIndex, 1); // Menghapus postingan dari array
+    res.redirect('/');
+});
+
 
 export default router;
